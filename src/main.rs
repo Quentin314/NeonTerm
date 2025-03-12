@@ -30,7 +30,7 @@ fn rainbow_square(size: usize, offset: usize) -> Vec<(u8, u8, u8)> {
     let mut pixels = Vec::with_capacity(size * size);
     for y in 0..size {
         for x in 0..size {
-            pixels.push((((((size * x) + offset) % size) as f32 / size as f32 * 256.0) as u8, (((x - offset) % size) as f32 / size as f32 * 256.0) as u8, ((((size * y) + offset) % size) as f32 / size as f32 * 256.0) as u8));
+            pixels.push((((((size - x) + offset) % size) as f32 / size as f32 * 256.0) as u8, (((x + offset) % size) as f32 / size as f32 * 256.0) as u8, ((((size - y) + offset) % size) as f32 / size as f32 * 256.0) as u8));
         }
     }
     return pixels;
