@@ -24,7 +24,7 @@ pub fn to_ansi(pixels: &mut Vec<(u8, u8, u8)>, width: usize, mut height: usize) 
                    bg.0, bg.1, bg.2, fg.0, fg.1, fg.2)
                    .unwrap();
         }
-        write!(output, "\x1b[0m\n");
+        write!(output, "\x1b[0m\n").unwrap();
     }
     return output;
 }
@@ -38,4 +38,9 @@ pub fn get_terminal_size() -> (usize, usize) {
 
 pub fn overwrite(ansi:String) {
     print!("\x1b[1;1H{}", ansi);
+}
+
+
+pub fn clear() {
+    print!("\x1b[2J");
 }

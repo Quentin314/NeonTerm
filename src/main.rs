@@ -15,6 +15,7 @@ fn main() {
     let speed = 2.0; // Controls animation speed
     
     let start_time = Instant::now();
+    renderer::clear();
     loop {
         // Get the terminal size
         let (width, height) = renderer::get_terminal_size();
