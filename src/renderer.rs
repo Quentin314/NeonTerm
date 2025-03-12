@@ -9,7 +9,7 @@ pub fn to_ansi(pixels: &mut Vec<(u8, u8, u8)>, width: usize, mut height: usize) 
     }
 
     // Create a big string with everything to print
-    let mut output = String::new();
+    let mut output = String::with_capacity(height * width * 25);
     for y in 0..height/2 {
         for x in 0..width {
             // Background color : pixels[(y*2) * width + x]
@@ -30,9 +30,6 @@ pub fn get_terminal_size() -> (usize, usize) {
 }
 
 
-pub fn clear() {
-    // Clears the terminal
-    print!("\x1b[2J");
-    // And returns the cursor to the top left corner of the terminal
-    print!("\x1b[1;1H");
+pub fn overwrite(ansi:String) {
+    print!("\x1b[1;1H{}", ansi);
 }
