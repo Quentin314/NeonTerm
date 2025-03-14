@@ -4,7 +4,7 @@ use noise::{Perlin, NoiseFn};
 
 fn main() {
     // Create the NeonTerm renderer
-    let mut term = renderer::NeonTerm::new((100, 100), (0, 0));
+    let mut term = renderer::NeonTerm::new((100, 100), (8, 8));
     // Create a noise generator with a random seed
     let perlin = Perlin::new(42);
         
@@ -16,14 +16,16 @@ fn main() {
     let mut frame_count = 0;
     loop {
         // Get the terminal size
-        let (width, height) = renderer::NeonTerm::get_term_size();
-        let size = width.min(height*2-4);
-        term.update_size(size, size);
+        let (mut width, mut height) = renderer::NeonTerm::get_term_size();
+        width -= 16;
+        height -= 16;
+        //let size = width.min(height*2-4);
+        term.update_size(width, height);
         // Update time - we'll use this as our z-coordinate in the noise function
         let time = start_time.elapsed().as_secs_f64() * speed;
         // Generate new colors for the entire grid
-        for y in 0..size {
-            for x in 0..size {
+        for y in 0..height {
+            for x in 0..width {
                 // Calculate noise coordinates - scaled to create nice patterns
                 let nx = x as f64 * scale;
                 let ny = y as f64 * scale;
@@ -40,7 +42,7 @@ fn main() {
                 let b = ((b_value * 0.5 + 0.5) * 255.0) as u8;
                 
                 // Store the color in the terminal buffer
-                term.buffer[y * size + x] = (r, g, b);
+                term.buffer[y * width + x] = (r, g, b);
             }
         }
 
@@ -48,7 +50,6 @@ fn main() {
         term.render();
 
         // Print the frame count
-        println!("Frame: {}", frame_count);
         frame_count += 1;
 
         // Sleep for a while

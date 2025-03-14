@@ -22,7 +22,7 @@ impl NeonTerm {
     }
 
 
-    fn to_ansi(pixels: &mut Vec<(u8, u8, u8)>, width: usize, mut height: usize) -> String {
+    fn to_ansi(pixels: &mut Vec<(u8, u8, u8)>, width: usize, mut height: usize, x_offset: usize, y_offset: usize) -> String {
         // Renders the pixels to the terminal using half blocks
         // If the height is odd, add an extra row of black pixels
         if height % 2 == 1 {
@@ -31,7 +31,12 @@ impl NeonTerm {
         }
     
         // Create a big string with everything to print
-        let mut output = String::with_capacity(height * width * 25);
+        let mut output = String::new();
+        // Y offset
+        for _ in 0..(y_offset/2) {
+            write!(output, "\n").unwrap();
+        }
+        write!(output, "{}", " ".repeat(x_offset)).unwrap();
         for y in 0..height/2 {
             for x in 0..width {
                 // Background color : pixels[(y*2) * width + x]
@@ -44,19 +49,23 @@ impl NeonTerm {
                        bg.0, bg.1, bg.2, fg.0, fg.1, fg.2)
                        .unwrap();
             }
-            write!(output, "\x1b[0m\n").unwrap();
+            if y < height/2 - 1 {
+                write!(output, "\x1b[0m\n{}", " ".repeat(x_offset)).unwrap();
+            } else {
+                write!(output, "\x1b[0m").unwrap();
+            }
         }
         return output;
     }
 
     fn overwrite(&mut self) {
-        print!("\x1b[1;1H{}", NeonTerm::to_ansi(&mut self.buffer, self.size.0, self.size.1));
+        print!("\x1b[1;1H{}", NeonTerm::to_ansi(&mut self.buffer, self.size.0, self.size.1, self.offset.0, self.offset.1));
     }
 
     pub fn get_term_size() -> (usize, usize) {
         // Get the size of the terminal
         let size = crossterm::terminal::size().unwrap();
-        return (size.0 as usize, size.1 as usize);
+        return (size.0 as usize, (size.1*2) as usize);
     }
 
     pub fn get_size(&self) -> (usize, usize) {
@@ -73,6 +82,14 @@ impl NeonTerm {
         }
         self.size = (width, height);
         self.buffer = vec![(0, 0, 0); width * height];
+        NeonTerm::clear();
+    }
+
+    pub fn update_offset(&mut self, offset: (usize, usize)) {
+        if self.offset == offset {
+            return;
+        }
+        self.offset = offset;
         NeonTerm::clear();
     }
 }
