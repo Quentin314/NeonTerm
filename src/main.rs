@@ -1,50 +1,29 @@
 mod renderer;
 use std::time::Instant;
 use noise::{Perlin, NoiseFn};
+use renderer::NeonTerm;
 
 fn main() {
     // Create the NeonTerm renderer
-    let mut term = renderer::NeonTerm::new((100, 100), (8, 8));
+    let mut term = renderer::NeonTerm::new((5, 5), (1, 1));
     // Create a noise generator with a random seed
     let perlin = Perlin::new(42);
-        
-    // Animation parameters
-    let scale = 0.005; // Controls how zoomed in/out the noise pattern is
-    let speed = 2.0; // Controls animation speed
     
     let start_time = Instant::now();
     let mut frame_count = 0;
     loop {
         // Get the terminal size
         let (mut width, mut height) = renderer::NeonTerm::get_term_size();
-        width -= 16;
-        height -= 16;
+        width -= 2;
+        height -= 2;
         //let size = width.min(height*2-4);
         term.update_size(width, height);
         // Update time - we'll use this as our z-coordinate in the noise function
-        let time = start_time.elapsed().as_secs_f64() * speed;
-        // Generate new colors for the entire grid
-        for y in 0..height {
-            for x in 0..width {
-                // Calculate noise coordinates - scaled to create nice patterns
-                let nx = x as f64 * scale;
-                let ny = y as f64 * scale;
-                
-                // Get noise values for each color component
-                // Offset each channel in noise-space to create interesting color variations
-                let r_value = perlin.get([nx, ny, time]);
-                let g_value = perlin.get([nx, ny, time + 100.0]); // Offset to create different patterns
-                let b_value = perlin.get([nx, ny, time + 200.0]); // Offset even more
-                
-                // Convert noise values (-1.0 to 1.0) to RGB (0 to 255)
-                let r = ((r_value * 0.5 + 0.5) * 255.0) as u8;
-                let g = ((g_value * 0.5 + 0.5) * 255.0) as u8;
-                let b = ((b_value * 0.5 + 0.5) * 255.0) as u8;
-                
-                // Store the color in the terminal buffer
-                term.buffer[y * width + x] = (r, g, b);
-            }
-        }
+        //let time = start_time.elapsed().as_secs_f64();
+        //term.buffer = noise(5, 5, 0.005, 2.0, time, &perlin);
+        
+
+        term.buffer = checkerboard(width, height);
 
         // Render
         term.render();
@@ -65,6 +44,50 @@ fn rainbow_square(size: usize, offset: usize) -> Vec<(u8, u8, u8)> {
     for y in 0..size {
         for x in 0..size {
             pixels.push((((((size - x) + offset) % size) as f32 / size as f32 * 256.0) as u8, (((x + offset) % size) as f32 / size as f32 * 256.0) as u8, ((((size - y) + offset) % size) as f32 / size as f32 * 256.0) as u8));
+        }
+    }
+    return pixels;
+}
+
+fn noise(width: usize, height: usize, scale: f64, speed: f64, time: f64, perlin: &Perlin) -> Vec<(u8, u8, u8)> {
+    let mut pixels: Vec<(u8,u8,u8)> = Vec::with_capacity(width * height);
+    // Generate new colors for the entire grid
+    for y in 0..height {
+        for x in 0..width {
+            // Calculate noise coordinates - scaled to create nice patterns
+            let nx = x as f64 * scale;
+            let ny = y as f64 * scale;
+            
+            // Get noise values for each color component
+            // Offset each channel in noise-space to create interesting color variations
+            let r_value = perlin.get([nx, ny, time*speed]);
+            let g_value = perlin.get([nx, ny, time*speed + 100.0]); // Offset to create different patterns
+            let b_value = perlin.get([nx, ny, time*speed + 200.0]); // Offset even more
+            
+            // Convert noise values (-1.0 to 1.0) to RGB (0 to 255)
+            let r = ((r_value * 0.5 + 0.5) * 255.0) as u8;
+            let g = ((g_value * 0.5 + 0.5) * 255.0) as u8;
+            let b = ((b_value * 0.5 + 0.5) * 255.0) as u8;
+            
+            // Store the color in the terminal buffer
+            pixels.push((r, g, b));
+        }
+    }
+
+    return pixels;
+}
+
+fn checkerboard(width: usize, height: usize) -> Vec<(u8, u8, u8)> {
+    // Create a checkerboard pattern
+    let mut pixels = Vec::with_capacity(width * height);
+    for y in 0..height {
+        for x in 0..width {
+            let color = if (x + y) % 2 == 0 {
+                (255, 255, 255)
+            } else {
+                (0, 0, 0)
+            };
+            pixels.push(color);
         }
     }
     return pixels;
