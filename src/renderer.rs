@@ -1,4 +1,4 @@
-use crossterm;
+use crossterm::terminal;
 
 use std::fmt::Write;
 
@@ -12,6 +12,8 @@ pub struct NeonTerm {
 impl NeonTerm {
     pub fn new(size: (usize, usize), offset: (usize, usize)) -> Self {
         let buffer = vec![(0, 0, 0); size.0 * size.1];
+        // Set terminal to raw mode
+        crossterm::terminal::enable_raw_mode().unwrap();
         crossterm::execute!(std::io::stdout(), crossterm::cursor::Hide).unwrap();
         NeonTerm::clear();
         return NeonTerm { buffer, size, offset };
@@ -59,7 +61,7 @@ impl NeonTerm {
                        .unwrap();
             }
             if y < height/2 - 1 + y_offset_odd {
-                write!(output, "\x1b[0m\n{}", " ".repeat(x_offset)).unwrap();
+                write!(output, "\x1b[0m\r\n{}", " ".repeat(x_offset)).unwrap();
             } else {
                 write!(output, "\x1b[0m").unwrap();
             }

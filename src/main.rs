@@ -5,7 +5,7 @@ use renderer::NeonTerm;
 
 fn main() {
     // Create the NeonTerm renderer
-    let mut term = renderer::NeonTerm::new((5, 5), (1, 1));
+    let mut term = NeonTerm::new((5, 5), (1, 1));
     // Create a noise generator with a random seed
     let perlin = Perlin::new(42);
     
@@ -13,9 +13,9 @@ fn main() {
     let mut frame_count = 0;
     loop {
         // Get the terminal size
-        let (mut width, mut height) = renderer::NeonTerm::get_term_size();
-        width -= 2;
-        height -= 2;
+        let (mut width, mut height) = NeonTerm::get_term_size();
+        width -= 20;
+        height -= 20;
         //let size = width.min(height*2-4);
         term.update_size(width, height);
         // Update time - we'll use this as our z-coordinate in the noise function
