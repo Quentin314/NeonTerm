@@ -6,25 +6,23 @@ use renderer::NeonTerm;
 fn main() {
     // Create the NeonTerm renderer
     let mut term = NeonTerm::new((5, 5), (1, 1));
+    //term.raw_texts.push(renderer::RawText::new("Hello, NeonTerm!", (255, 0, 0), (0, 0, 0), (0, 0)));
     // Create a noise generator with a random seed
     let perlin = Perlin::new(42);
     
     let start_time = Instant::now();
     let mut frame_count = 0;
     loop {
+        //term.fullscreen();
         // Get the terminal size
-        let (mut width, mut height) = NeonTerm::get_term_size();
-        width -= 20;
-        height -= 20;
-        //let size = width.min(height*2-4);
-        term.update_size(width, height);
+        let (mut width, mut height) = term.get_size();
+
         // Update time - we'll use this as our z-coordinate in the noise function
         //let time = start_time.elapsed().as_secs_f64();
-        //term.buffer = noise(5, 5, 0.005, 2.0, time, &perlin);
-        
+        //term.buffer = noise(width, height, 0.005, 2.0, time, &perlin);
 
         term.buffer = checkerboard(width, height);
-
+        
         // Render
         term.render();
 
