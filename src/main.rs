@@ -5,29 +5,26 @@ use renderer::NeonTerm;
 
 fn main() {
     // Create the NeonTerm renderer
-    let mut term = NeonTerm::new((5, 5), (1, 1));
-    //term.raw_texts.push(renderer::RawText::new("Hello, NeonTerm!", (255, 0, 0), (0, 0, 0), (0, 0)));
+    let mut term = NeonTerm::new((50, 50), (0, 0));
+    term.raw_texts.push(renderer::RawText::new("Hello, NeonTerm!", (255, 0, 0), (0, 0, 0), (10, 5)));
     // Create a noise generator with a random seed
     let perlin = Perlin::new(42);
     
     let start_time = Instant::now();
-    let mut frame_count = 0;
     loop {
-        //term.fullscreen();
+        term.fullscreen();
+
         // Get the terminal size
         let (mut width, mut height) = term.get_size();
 
         // Update time - we'll use this as our z-coordinate in the noise function
-        //let time = start_time.elapsed().as_secs_f64();
-        //term.buffer = noise(width, height, 0.005, 2.0, time, &perlin);
+        let time = start_time.elapsed().as_secs_f64();
+        term.buffer = noise(width, height, 0.005, 2.0, time, &perlin);
 
-        term.buffer = checkerboard(width, height);
+        //term.buffer = checkerboard(width, height);
         
         // Render
         term.render();
-
-        // Print the frame count
-        frame_count += 1;
 
         // Sleep for a while
         std::thread::sleep(std::time::Duration::from_millis(0));
