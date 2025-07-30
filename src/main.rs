@@ -31,7 +31,7 @@ fn main() {
         if neon_input.pressed_keys.contains(&input::KeyCode::Escape) {
             break; // Exit the loop if Escape is pressed
         }
-        if neon_input.pressed_keys.contains(&input::KeyCode::F11) {
+        if neon_input.pressed_keys.contains(&input::KeyCode::F1) {
             term.fullscreen(); // Toggle fullscreen on F11
         }
         let keydowns = neon_input.get_keydown_events();
