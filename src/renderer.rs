@@ -1,8 +1,9 @@
-use std::{fmt::Write, thread};
+use std::{fmt::Write, os::raw, thread};
 
 
 #[derive(Debug, Clone)]
 pub struct RawText {
+    // WARNING: Do not use newlines or tabs in the text, it will break the rendering
     pub text: String,
     pub fg: (u8, u8, u8),
     pub bg: (u8, u8, u8),
@@ -104,7 +105,7 @@ impl NeonTerm {
             write!(output, "\x1b[38;2;{};{};{}m", raw_text.fg.0, raw_text.fg.1, raw_text.fg.2).unwrap();
             // Set background color
             write!(output, "\x1b[48;2;{};{};{}m", raw_text.bg.0, raw_text.bg.1, raw_text.bg.2).unwrap();
-            // Write text
+            // Write text (filter out newlines and tabs)
             write!(output, "{}", raw_text.text).unwrap();
         }
         // Reset colors
